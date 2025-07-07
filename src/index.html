@@ -12,7 +12,8 @@
   <main>
     <h1>Vanilla JavaScript App</h1>
     <div id="api-result">Loading...</div>
-    <div id="sse-api-result">Waiting for SSE messages...</div>
+    <div id="sse-api-default">Waiting for SSE default event message...</div>
+    <div id="sse-api-time-update">Waiting for SSE time-update event messages...</div>
   </main>
   <script>
     // API のエンドポイント
@@ -33,23 +34,32 @@
 
     // SSE (Server-Sent Events) のエンドポイントアクセス
     const sseApiUrl = 'https://takumagencho-linux-node.azurewebsites.net/stream/sse/300';
-    const sseApiResult = document.getElementById('sse-api-result');
-    sseApiResult.textContent = 'Waiting for SSE messages...';
+
+    const sseApiDefaultResult = document.getElementById('sse-api-default');
+    sseApiDefaultResult.textContent = 'Waiting for SSE default event message...';
+
+    const sseApiTimeUpdateResult = document.getElementById('sse-api-time-update');
+    sseApiTimeUpdateResult.textContent = 'Waiting for SSE time-update event messages...';
 
     const eventSource = new EventSource(sseApiUrl);
-    console.log('Default text content:', sseApiResult.textContent);
 
     eventSource.onopen = function () {
       console.log('SSE connection opened');
     };
 
+    eventSource.onmessage = function (event) {
+      console.log('SSE message event:', event);
+      sseApiDefaultResult.textContent = 'SSE message event: ' + event.data;
+    };
+
+
     eventSource.addEventListener('time-update', function (event) {
       console.log('time-update event:', event);
-      sseApiResult.textContent = event.data;
+      sseApiTimeUpdateResult.textContent = 'time-update event: ' + event.data;
     });
 
     eventSource.onerror = function (error) {
-      sseApiResult.textContent = 'SSE connection error: ' + error.message;
+      sseApiDefaultResult.textContent = 'SSE connection error: ' + error.message;
       eventSource.close();
     };
 
