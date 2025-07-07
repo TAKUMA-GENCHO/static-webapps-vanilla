@@ -11,7 +11,26 @@
 <body>
   <main>
     <h1>Vanilla JavaScript App</h1>
+    <div id="api-result">Loading...</div>
   </main>
+  <script>
+    // API のエンドポイント
+    const apiUrl = 'https://takumagencho-linux-node.azurewebsites.net/httpstatus/200';
+
+
+    fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        // 取得したデータを表示
+        document.getElementById('api-result').textContent = JSON.stringify(data, null, 2);
+      })
+      .catch(error => {
+        document.getElementById('api-result').textContent = 'Error: ' + error.message;
+      });
+  </script>
 </body>
 
 </html>
